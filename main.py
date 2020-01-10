@@ -49,7 +49,9 @@ def main():
 
     BROADCAST_IP = esp8266_ip[:esp8266_ip.rfind('.')] + '.255'
     mq = mqtt(oled=oled,client_id=client_id, username=product_id, password=authinfo,macs=macs,BROADCAST_IP=BROADCAST_IP,BROADCAST_PORT=BROADCAST_PORT)
-    mq.connect()
+    while True:
+        mq.connect()
+        time.sleep(30)
 
 
 if __name__ == '__main__':
