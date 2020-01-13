@@ -12,6 +12,8 @@ import time
 
 def apmode(wifi_name,password):
     ap_if = network.WLAN(network.AP_IF)
+    if not ap_if.active(False):
+        ap_if.active(True)
     ap_if.config(essid=wifi_name, authmode=network.AUTH_WPA_WPA2_PSK, password=password)
     net_config = ap_if.ifconfig()
     return net_config[0]

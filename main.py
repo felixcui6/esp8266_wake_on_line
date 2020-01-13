@@ -26,19 +26,29 @@ def main():
     oled = OLED()
     oled.write_lines(line1='start...')
     currdir = uos.getcwd()
-    files = uos.listdir(currdir)
-    if ('config.ini' in files):
+    try:
         fconfig = open(currdir + 'config.ini', 'r')
         configdic = ujson.loads(fconfig.read())
         fconfig.close()
+    except:
+        configdic = {'WiFiName':'','WiFiPasswd':False}
+        fconfig = open(currdir + 'config.ini', 'w')
+        fconfig.write(ujson.dumps(configdic))
+        fconfig.flush()
+        fconfig.close()
+
+    if configdic['WiFiPasswd']:
         oled.write_lines(line2='connecting to network...')
         flag,wifi_status,esp8266_ip = connect_wifi(configdic['WiFiName'], configdic['WiFiPasswd'])
         if flag:
             oled.write_lines(line1='ip:'+esp8266_ip,line2='',line3='')
         else:
             oled.write_lines(line3='connect network failed, restarting...')
-            if wifi_status == 2 or wifi_status == 3:
-                uos.remove(currdir + 'config.ini')
+            configdic = {'WiFiName': '', 'WiFiPasswd': False}
+            fconfig = open(currdir + 'config.ini', 'w')
+            fconfig.write(ujson.dumps(configdic))
+            fconfig.flush()
+            fconfig.close()
             machine.reset()
     else:
         esp8266_ip = apmode(wifi_name,wifi_password)
